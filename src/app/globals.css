@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #1E293B;
+  --civic-blue: #1D4ED8;
+  --civic-navy: #0F172A;
+  --civic-border: #E2E8F0;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-civic-blue: #1D4ED8;
+  --color-civic-blue-hover: #1E40AF;
+  --color-civic-blue-light: #EFF6FF;
+  --color-civic-navy: #0F172A;
+  --color-civic-navy-dark: #020617;
+  --color-civic-bg: #F8FAFC;
+  --color-civic-card: #FFFFFF;
+  --color-civic-text: #1E293B;
+  --color-civic-muted: #64748B;
+  --color-civic-border: #E2E8F0;
+  --color-civic-border-strong: #CBD5E1;
+  --color-civic-success: #15803D;
+  --color-civic-success-light: #DCFCE7;
+  --color-civic-warning: #B45309;
+  --color-civic-warning-light: #FEF3C7;
+  --color-civic-danger: #B91C1C;
+  --color-civic-danger-light: #FEE2E2;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for clean administrative tables and lists */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }

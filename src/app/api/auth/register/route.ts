@@ -1,64 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/db";
 import { registerSchema } from "@/lib/validations";
+import { userStore } from "@/lib/user-store";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate input
+    // 1. Validate input schema
     const result = registerSchema.safeParse(body);
     if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      const firstError = Object.values(fieldErrors).flat()[0] || "Validation failed";
       return NextResponse.json(
-        { error: "Validation failed", details: result.error.flatten().fieldErrors },
+        { error: firstError, details: fieldErrors },
         { status: 400 }
       );
     }
 
-    const { name, email, password, phone } = result.data;
+    const { name, registrationNumber, email, phone, password } = result.data;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // 2. Attempt user creation in userStore
+    // Automatically receives role "CITIZEN", prevents duplicate email/regNo, prevents admin tampering
+    const createResult = await userStore.createUser({
+      name,
+      registrationNumber,
+      email,
+      phone,
+      password,
     });
 
-    if (existingUser) {
+    if (createResult.error || !createResult.user) {
       return NextResponse.json(
-        { error: "An account with this email already exists" },
+        { error: createResult.error || "Unable to register account" },
         { status: 409 }
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        hashedPassword,
-        phone: phone || null,
-        role: "CITIZEN",
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
     return NextResponse.json(
-      { data: user, message: "Account created successfully" },
+      {
+        data: createResult.user,
+        message: "Account registered successfully. You can now log in.",
+      },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Registration endpoint error:", error);
     return NextResponse.json(
-      { error: "An unexpected error occurred. Please try again." },
+      { error: "An unexpected server error occurred. Please try again." },
       { status: 500 }
     );
   }

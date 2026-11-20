@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
 import { redirect } from "next/navigation";
+
+export type RoleType = "ADMIN" | "OFFICER" | "CITIZEN";
 
 /**
  * Get the current authenticated session or redirect to login.
@@ -14,12 +15,12 @@ export async function requireAuth() {
 }
 
 /**
- * Require a specific role or higher. Redirects to unauthorized page.
+ * Require a specific role or higher. Redirects to unauthorized or home page.
  */
-export async function requireRole(...roles: UserRole[]) {
+export async function requireRole(...roles: RoleType[]) {
   const session = await requireAuth();
   if (!roles.includes(session.user.role)) {
-    redirect("/unauthorized");
+    redirect("/auth/login?error=unauthorized");
   }
   return session;
 }
@@ -46,7 +47,7 @@ export async function requireApiAuth() {
 /**
  * Require role for API routes - returns session or throws.
  */
-export async function requireApiRole(...roles: UserRole[]) {
+export async function requireApiRole(...roles: RoleType[]) {
   const session = await requireApiAuth();
   if (!roles.includes(session.user.role)) {
     throw new Error("FORBIDDEN");

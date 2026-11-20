@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ADM-001",
+    "name": "Abhay Sharma",
+    "registrationNumber": "ADM-001",
+    "email": "admin1@smartgov.gov.in",
+    "phone": "+91 98765 43210",
+    "role": "ADMIN",
+    "designation": "System Architect & Project Owner",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "hashedPassword": "$2b$10$UtfxDlBoj.UByNO7pG.Doe9It8v15Zg2f84qB8FZL3.tn6JlimJAW"
+  },
+  {
+    "id": "ADM-002",
+    "name": "Vatsal",
+    "registrationNumber": "ADM-002",
+    "email": "admin2@smartgov.gov.in",
+    "phone": "+91 98765 43211",
+    "role": "ADMIN",
+    "designation": "Municipal Operations Lead",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "hashedPassword": "$2b$10$UtfxDlBoj.UByNO7pG.Doe9It8v15Zg2f84qB8FZL3.tn6JlimJAW"
+  },
+  {
+    "id": "ADM-003",
+    "name": "Sehaj",
+    "registrationNumber": "ADM-003",
+    "email": "admin3@smartgov.gov.in",
+    "phone": "+91 98765 43212",
+    "role": "ADMIN",
+    "designation": "Zonal Grievance Commissioner",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "hashedPassword": "$2b$10$UtfxDlBoj.UByNO7pG.Doe9It8v15Zg2f84qB8FZL3.tn6JlimJAW"
+  },
+  {
+    "id": "USR-001",
+    "name": "Aarav Mehta",
+    "registrationNumber": "22BCS10045",
+    "email": "student@university.edu",
+    "phone": "+91 98123 45678",
+    "role": "CITIZEN",
+    "designation": "Undergraduate Student",
+    "createdAt": "2026-02-15T10:30:00.000Z",
+    "hashedPassword": "$2b$10$b/y70F7sSstmeNcUkq6xuOOd5/Zm/ZmraZlMUd9lsOncW7R8iI6K."
+  },
+  {
+    "id": "usr-1794802018335-lzhuq",
+    "name": "Rahul Verma",
+    "registrationNumber": "22BCS10888",
+    "email": "rahul.verma@university.edu",
+    "phone": "9876501234",
+    "hashedPassword": "$2b$12$xzmAvcri0.mAJ97tpPElxuJGm.cUVk1Qe4LGkr.fflKFIf3hdvNd6",
+    "role": "CITIZEN",
+    "designation": "Registered Citizen / Student",
+    "createdAt": "2026-11-16T04:06:58.335Z",
+    "updatedAt": "2026-11-16T04:06:58.335Z"
+  }
+]

@@ -1,9 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
-import prisma from "@/lib/db";
-import type { UserRole } from "@prisma/client";
+import { userStore } from "@/lib/user-store";
 
 declare module "next-auth" {
   interface Session {
@@ -11,61 +9,61 @@ declare module "next-auth" {
       id: string;
       email: string;
       name: string | null;
-      role: UserRole;
-      departmentId: string | null;
-      image: string | null;
+      role: "ADMIN" | "CITIZEN" | "OFFICER";
+      registrationNumber?: string;
+      designation?: string;
+      departmentId?: string | null;
+      image?: string | null;
     };
   }
 
   interface User {
-    role: UserRole;
-    departmentId: string | null;
+    role: "ADMIN" | "CITIZEN" | "OFFICER";
+    registrationNumber?: string;
+    designation?: string;
+    departmentId?: string | null;
   }
 }
 
 declare module "@auth/core/jwt" {
   interface JWT {
     id: string;
-    role: UserRole;
-    departmentId: string | null;
+    role: "ADMIN" | "CITIZEN" | "OFFICER";
+    registrationNumber?: string;
+    designation?: string;
+    departmentId?: string | null;
   }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
   pages: {
     signIn: "/auth/login",
-    error: "/auth/error",
+    error: "/auth/login",
   },
   providers: [
     Credentials({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        identifier: { label: "Email or Registration Number", type: "text" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const rawIdentifier = (credentials?.identifier || credentials?.email) as string | undefined;
+        const password = credentials?.password as string | undefined;
+
+        if (!rawIdentifier || !password) {
           return null;
         }
 
-        const email = credentials.email as string;
-        const password = credentials.password as string;
-
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!user || !user.hashedPassword || !user.isActive) {
+        // 1. Check userStore (local secure persistent store with 3 authorized admins)
+        const user = userStore.findByIdentifier(rawIdentifier);
+        if (!user || !user.hashedPassword) {
           return null;
         }
 
-        const isPasswordValid = await bcrypt.compare(
-          password,
-          user.hashedPassword
-        );
-
+        const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
         if (!isPasswordValid) {
           return null;
         }
@@ -75,8 +73,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
-          departmentId: user.departmentId,
-          image: user.image,
+          registrationNumber: user.registrationNumber,
+          designation: user.designation,
+          departmentId: null,
+          image: null,
         };
       },
     }),
@@ -86,15 +86,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id as string;
         token.role = user.role;
-        token.departmentId = user.departmentId;
+        token.registrationNumber = user.registrationNumber;
+        token.designation = user.designation;
+        token.departmentId = user.departmentId ?? null;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
-        session.user.departmentId = token.departmentId;
+        session.user.registrationNumber = token.registrationNumber;
+        session.user.designation = token.designation;
+        session.user.departmentId = token.departmentId ?? null;
       }
       return session;
     },

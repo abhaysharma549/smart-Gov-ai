@@ -5,23 +5,30 @@ import { z } from "zod";
 // ============================================================
 
 export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  identifier: z
+    .string()
+    .min(3, "Please enter your Email or University Registration Number"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
 });
 
 export const registerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(100),
+    name: z.string().min(2, "Full Name must be at least 2 characters").max(100),
+    registrationNumber: z
+      .string()
+      .min(3, "University Registration Number must be at least 3 characters")
+      .max(30, "University Registration Number is too long")
+      .regex(/^[A-Za-z0-9\-_]+$/, "Registration number can only contain letters, numbers, and hyphens"),
     email: z.string().email("Please enter a valid email address"),
-    phone: z.string().optional(),
+    phone: z
+      .string()
+      .min(10, "Mobile number must be at least 10 digits")
+      .regex(/^[0-9+\s\-()]+$/, "Please enter a valid mobile number"),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
-      ),
-    confirmPassword: z.string(),
+      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -52,9 +59,7 @@ export const complaintSchema = z.object({
   urgencyNote: z.string().max(1000).optional(),
   imageIds: z.array(z.string()).max(5, "Maximum 5 images allowed").optional(),
   consent: z.literal(true, {
-    errorMap: () => ({
-      message: "You must consent to the privacy policy to submit a complaint",
-    }),
+    message: "You must consent to the privacy policy to submit a complaint",
   }),
 });
 
